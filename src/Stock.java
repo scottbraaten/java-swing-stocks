@@ -73,7 +73,17 @@ public class Stock {
     // toString
     @Override
     public String toString() {
-        return this.name;
+        String display;
+        
+        // check if number of shares is an integer to display a better output
+        int possible = (int) this.qty;
+        if (Math.floor(this.qty) == this.qty) {
+            display = this.name + ": " + possible + " shares";
+        } else {
+            display = this.name + ": " + this.qty + " shares";
+        }
+        
+        return display;
     }
     
     // returns profit or loss

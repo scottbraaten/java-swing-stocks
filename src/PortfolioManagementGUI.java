@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import javax.swing.DefaultListModel;
@@ -25,6 +27,7 @@ Program Description: Provides user with way of tracking stocks - adding
 
 public class PortfolioManagementGUI extends javax.swing.JFrame {
     private DefaultListModel<Stock> stockModel;
+    private ArrayList<Stock> stocks;
     
     /**
      * Creates new form PortfolioManagementGUI
@@ -32,6 +35,7 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
     public PortfolioManagementGUI() {
         // initialize before initComponents
         stockModel = new DefaultListModel<Stock>();
+        stocks = new ArrayList<Stock>();
         
         initComponents();
         
@@ -57,6 +61,7 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
         listStocks = new javax.swing.JList<>();
         txtStockInfo = new javax.swing.JLabel();
         btnRemove = new javax.swing.JButton();
+        lblTotalValue = new javax.swing.JLabel();
         pnlAdd = new javax.swing.JPanel();
         lblName = new javax.swing.JLabel();
         lblQty = new javax.swing.JLabel();
@@ -67,6 +72,11 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
         txtPurchase = new javax.swing.JTextField();
         txtCurrent = new javax.swing.JTextField();
         btnAdd = new javax.swing.JButton();
+        jMenuBar1 = new javax.swing.JMenuBar();
+        mnuMain = new javax.swing.JMenu();
+        itmOpen = new javax.swing.JMenuItem();
+        itmSave = new javax.swing.JMenuItem();
+        itmExit = new javax.swing.JMenuItem();
 
         jMenuItem1.setText("jMenuItem1");
 
@@ -95,13 +105,17 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
             pnlListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 338, Short.MAX_VALUE)
             .addGroup(pnlListLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(txtStockInfo)
+                .addGroup(pnlListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlListLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(txtStockInfo))
+                    .addGroup(pnlListLayout.createSequentialGroup()
+                        .addGap(117, 117, 117)
+                        .addComponent(btnRemove))
+                    .addGroup(pnlListLayout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(lblTotalValue, javax.swing.GroupLayout.PREFERRED_SIZE, 134, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlListLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnRemove)
-                .addGap(115, 115, 115))
         );
         pnlListLayout.setVerticalGroup(
             pnlListLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -109,9 +123,11 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 84, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(txtStockInfo)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 61, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
                 .addComponent(btnRemove)
-                .addGap(24, 24, 24))
+                .addGap(18, 18, 18)
+                .addComponent(lblTotalValue, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         tbpManage.addTab("List", pnlList);
@@ -170,12 +186,42 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
                 .addGroup(pnlAddLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lblCurrent)
                     .addComponent(txtCurrent, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 33, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 59, Short.MAX_VALUE)
                 .addComponent(btnAdd)
                 .addContainerGap())
         );
 
         tbpManage.addTab("Add Stock", pnlAdd);
+
+        mnuMain.setText("File");
+
+        itmOpen.setText("Open");
+        itmOpen.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itmOpenActionPerformed(evt);
+            }
+        });
+        mnuMain.add(itmOpen);
+
+        itmSave.setText("Save");
+        itmSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itmSaveActionPerformed(evt);
+            }
+        });
+        mnuMain.add(itmSave);
+
+        itmExit.setText("Exit");
+        itmExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                itmExitActionPerformed(evt);
+            }
+        });
+        mnuMain.add(itmExit);
+
+        jMenuBar1.add(mnuMain);
+
+        setJMenuBar(jMenuBar1);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -287,13 +333,14 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(this, "This stock has already been entered.");
             return;
         }
-        
-        // validate stockQty
-//        if (stockQty)
 
         // Instantiate new Stock and add to stockModel
         Stock stock = new Stock(stockName, stockQty, stockPurchase, stockCurrent);
         stockModel.addElement(stock);
+        stocks.add(stock);
+        
+        // set totalvalue
+        calcTotal();
         
         // reset textFields
         txtName.setText("");
@@ -336,6 +383,8 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
             }
         } else {
             stockModel.removeElementAt(index);
+            stocks.remove(index);
+            calcTotal();
         }
         
         // Set btnRemove visibility to false if there are no more stocks to remove.
@@ -346,6 +395,51 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
         // clear stock info text
         txtStockInfo.setText("");
     }//GEN-LAST:event_btnRemoveActionPerformed
+
+    private void itmOpenActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itmOpenActionPerformed
+        // handle appropriate filename and correct file extension
+        String fileName = JOptionPane.showInputDialog("Enter filename without extension - no periods");
+        while (fileName.contains(".")) {
+            fileName = JOptionPane.showInputDialog("Enter filename without extension - no periods");
+        }
+        fileName += ".txt";
+        
+        // create new stockIO based on fileName
+        StockIO stockIO = new StockIO(fileName);
+        
+        // after arraylist is returned, ensure DefaultListModel is populated with ArrayList. Then updated total value.
+        try {
+            stocks = stockIO.getData();
+            populateDLM();
+            calcTotal();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.toString());
+        }
+    }//GEN-LAST:event_itmOpenActionPerformed
+
+    private void itmSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itmSaveActionPerformed
+        // handle appropriate filename and correct file extension
+        String fileName = JOptionPane.showInputDialog("Enter filename without extension - no periods");
+        while (fileName.contains(".")) {
+            fileName = JOptionPane.showInputDialog("Enter filename without extension - no periods");
+        }
+        fileName += ".txt";
+        
+        // create new stockIO based on fileName
+        StockIO stockIO = new StockIO(fileName);
+        
+        // pass ArrayList to stockIO to write to file
+        try {
+            stockIO.saveData(stocks);
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error: " + e.toString());
+        }
+        
+    }//GEN-LAST:event_itmSaveActionPerformed
+
+    private void itmExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_itmExitActionPerformed
+        System.exit(0);
+    }//GEN-LAST:event_itmExitActionPerformed
 
     /**
      * @param args the command line arguments
@@ -385,14 +479,20 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnAdd;
     private javax.swing.JButton btnRemove;
+    private javax.swing.JMenuItem itmExit;
+    private javax.swing.JMenuItem itmOpen;
+    private javax.swing.JMenuItem itmSave;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblCurrent;
     private javax.swing.JLabel lblName;
     private javax.swing.JLabel lblPurchase;
     private javax.swing.JLabel lblQty;
+    private javax.swing.JLabel lblTotalValue;
     private javax.swing.JList<Stock> listStocks;
+    private javax.swing.JMenu mnuMain;
     private javax.swing.JPanel pnlAdd;
     private javax.swing.JPanel pnlList;
     private javax.swing.JTabbedPane tbpManage;
@@ -403,5 +503,31 @@ public class PortfolioManagementGUI extends javax.swing.JFrame {
     private javax.swing.JLabel txtStockInfo;
     // End of variables declaration//GEN-END:variables
 
+    // method for updating total value
+    private void calcTotal() {
+        double total = 0;
+        
+        // iterate through stocks and sum the current price * qty
+        for (Stock stock : stocks) {
+            total += stock.getCurrentPrice() * stock.getQty();
+        }
+        
+        // output totalvalue to label
+        lblTotalValue.setText("Total Value: $" + String.format("%.2f",total));
+    }
+    
+    // method for populating DefaultListModel with stocks ArrayList
+    private void populateDLM() {
+        // assign a new DefaultListModel to stockModel
+        stockModel = new DefaultListModel<Stock>();
+        
+        // iterate through stocks and add each element to stockModel
+        for (Stock stock : stocks){
+            stockModel.addElement(stock);
+        }
+        
+        // reset what model is used for JList
+        listStocks.setModel(stockModel);
+    }
 
 }
